@@ -1,0 +1,24 @@
+{
+  "name": "rimel",
+  "version": "1.0.0",
+  "description": "A retro-ingenierie project",
+  "main": "crawler.js",
+  "dependencies": {
+    "octonode": "^0.9.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "crawl": "node crawl.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salord-f/rimel.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/salord-f/rimel/issues"
+  },
+  "homepage": "https://github.com/salord-f/rimel#readme"
+}
