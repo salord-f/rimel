@@ -11,16 +11,14 @@ Ce sujet nous permet de voir concrètement comment différentes solutions répon
 
 D'autre part, c'est un sujet d'actualité. De plus en plus d'applications sont conteneurisées et ont besoins d'être paramétrées à différents niveaux, afin d'être déployée dans des environnements qui ne sont pas contrôlés directement par l'utilisateur comme un service cloud.
 
-## Décomposition en sous-questions et métriques/KPI/outils **envisagés** pour y répondre
+## Décomposition en sous-questions et métriques/KPI/outils envisagés pour y répondre
 
 Nous avons choisi de nous concentrer sur un point précis de la problématique énoncée ci-dessus : 
-### À quel niveau ces paramètres peuvent-ils être définis ?
-
-Cela reste une question très vague qui va tendre à évoluer au fil de nos recherches et analyses.
+### Quels sont les types de paramètres de haut niveaux définissables et où sont-ils configurés ?
 
 Pour pouvoir y répondre, plusieurs aspects devront être étudiés :  
-D'une part, nous allons devoir identifier quels sont les paramètres de haut niveaux possible, où et comment ils sont déclarés.  
-D'autre part nous devrons ensuite analyser leur impact sur l'application.  
+D'une part, nous allons devoir identifier quels sont les paramètres de haut niveaux possible, et les regrouper par type.  
+D'autre part, nous devrons ensuite analyser leur endroit de déclaration et l'impact que ça peut avoir sur le projet.
 
 Nous avons envisagé plusieurs pistes à ce niveau là :  
 Certaines métriques sont explicites et ciblent un point précis de l'application, comme l'url d'une base de données, ou le port à utiliser par un serveur.  
@@ -28,7 +26,8 @@ Pour d'autres métriques plus implicites, nous pourrons essayer de corréler leu
 
 ## Démarche prévue 
 
-Pour mettre en place tout cela, nous allons avoir besoin d'outils. 
+Pour mettre en place tout cela, nous allons avoir dans un premier temps de nous renseigner sur les types de paramètres de haut niveaux qui peuvent être déclarés. Ces types nous permettrons de nous focaliser sur un sous ensemble de chacun des type. Pour chaque sous-ensemble nous aurons besoin d'outils afin d'analyser quels projets déclarent ce type de paramètres et où.
+ 
 Il faudra dans un premier temps automatiser le clonage des dépôts, puis vérifier que l'échantillon de données est pertinent par rapport à notre problématique. Les dépôts devront ainsi posséder un ou plusieurs dockerfile et éventuellement un docker-compose, ou autre document servant au déployement du projet en question. 
 
 Pour réaliser cela, nous avons penser à utiliser l'outil [octonode](https://github.com/pksunkara/octonode) qui est une bibliothèque Node.js permettant d'accéder à l'api de [github](https://developer.github.com/v3/).

@@ -9,7 +9,7 @@ client.get('/repos/salord-f/rimel', {}, function (err, status, body, headers) {
 const ghsearch = client.search();
 
 ghsearch.repos({
-  q: 'hub+language:go',
-  sort: 'created',
-  order: 'asc'
+  q: 'language:java',
+  sort: 'stars',
+  order: 'desc'
 }, console.log); //array of search results
