@@ -4,7 +4,7 @@ import pygit2
 # First create a Github instance:
 import os, sys
 
-g = Github("d4a731d1dc9e40d43f9548929e9b4a62a19badc9")
+g = Github(os.environ['TOKEN'])
 
 repos = []
 wanted = []
