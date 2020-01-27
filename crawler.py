@@ -16,34 +16,34 @@ wanted = []
 
 
 x = g.get_repos()
-reposQuery = g.search_repositories("stars:>3000 topic:docker")
-
+reposQuery = g.search_repositories("stars:>5000 topic:docker")
 
 print('Total repos queried : ' + str(reposQuery.totalCount))
 for repoQuery in reposQuery:
     # TODO do it recursively, at least for src ...
-    print(repoQuery)
+    print("Repository : " + repoQuery.name)
     files = repoQuery.get_contents("")
     for file in files:
         if 'Dockerfile' == file.path or 'docker-compose.yml' == file.path:
-            print('This repo is being kept' + str(reposQuery.totalCount))
+            print('This repo has a Dockerfile or a docker-compose.yml, cloning.')
             wantedRepo.append(repoQuery)
             pygit2.clone_repository(repoQuery.git_url, './repository/' + repoQuery.name + '/')
             break
 print('Number of repos kept : ' + str(len(wantedRepo)))
 
-
+found = []
 
 count = 0
 for dir in os.listdir(repositoryClone):
     for file in os.listdir(repositoryClone + dir):
-        print(file)
+        #print(file)
         if re.search('Dockerfile|docker-compose.yml', file):
             with open(repositoryClone + dir + '/' + file) as f:
                 if re.search('mongo', f.read(), re.IGNORECASE):
                     count += 1
+                    found.append(dir)
 print('number of times the string mongo has been located : ' + str(count))
-
+print(found)
 
 '''
 for repo in g.get_organization("dockersamples").get_repos():
@@ -54,6 +54,7 @@ for repo in g.get_organization("dockersamples").get_repos():
             #if repo.name not in os.listdir('./repository'):
             wanted.append(repo)
             print(repo.name)
+            break
                 #pygit2.clone_repository(repo.git_url, './repository/'+repo.name+'/')
 
 
