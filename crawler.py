@@ -2,6 +2,7 @@ import re
 import pygit2
 from github import Github
 import re
+import base64
 
 
 # First create a Github instance:
@@ -18,6 +19,9 @@ wanted = []
 x = g.get_repos()
 reposQuery = g.search_repositories("stars:>5000 topic:docker")
 
+query = b'mongo'
+
+
 print('Total repos queried : ' + str(reposQuery.totalCount))
 for repoQuery in reposQuery:
     # TODO do it recursively, at least for src ...
@@ -25,13 +29,15 @@ for repoQuery in reposQuery:
     files = repoQuery.get_contents("")
     for file in files:
         if 'Dockerfile' == file.path or 'docker-compose.yml' == file.path:
-            print('This repo has a Dockerfile or a docker-compose.yml, cloning.')
-            wantedRepo.append(repoQuery)
-            try:
-                pygit2.clone_repository(repoQuery.git_url, './repository/' + repoQuery.name + '/')
-                break
-            except ValueError:
-                print('Repository already cloned')
+            content = base64.b64decode(file.content)
+            if re.search(query, content) is not None:
+                try:
+                    wantedRepo.append(repoQuery)
+                    print('This repo has a Dockerfile or a docker-compose.yml, and either has the keyword : ' + query.decode('utf-8') + ', cloning.')
+                    pygit2.clone_repository(repoQuery.git_url, './repository/' + repoQuery.name + '/')
+                    break
+                except ValueError:
+                    print('Repository already cloned')
 
 print('Number of repos kept : ' + str(len(wantedRepo)))
 
