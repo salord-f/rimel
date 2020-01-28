@@ -18,11 +18,11 @@ def file_is_interesting(query, file_to_analyze, repo_to_analyze):
                     '====> This repo has a Dockerfile or a docker-compose.yml, and either has the keyword : ' + query.decode(
                         'utf-8') + ', cloning.')
                 pygit2.clone_repository(repo_to_analyze.git_url, './repository/' + repo_to_analyze.name + '/')
-                return True
             except ValueError:
                 print('Repository already cloned')
             except:
                 print('cant clone because w10 is garbage')
+            finally:
                 return True
 
 
