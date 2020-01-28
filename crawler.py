@@ -27,8 +27,12 @@ for repoQuery in reposQuery:
         if 'Dockerfile' == file.path or 'docker-compose.yml' == file.path:
             print('This repo has a Dockerfile or a docker-compose.yml, cloning.')
             wantedRepo.append(repoQuery)
-            pygit2.clone_repository(repoQuery.git_url, './repository/' + repoQuery.name + '/')
-            break
+            try:
+                pygit2.clone_repository(repoQuery.git_url, './repository/' + repoQuery.name + '/')
+                break
+            except ValueError:
+                print('Repository already cloned')
+
 print('Number of repos kept : ' + str(len(wantedRepo)))
 
 found = []
