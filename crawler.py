@@ -114,18 +114,15 @@ count = 0
 for q in queries:
 	print(q.totalCount)
 	count += q.totalCount
-print("Total : " + str(count))
 # query = b'mongo'
+	for repoQuery in q:
+		print("-------------------- Repository : " + repoQuery.name + " --------------------------")
+		if contains_docker_file_or_compose_recursively(repoQuery, query):
+			found.append(repoQuery)
 
-'''
-print('Total repos queried : ' + str(reposQuery.totalCount))
-for repoQuery in reposQuery:
-	print("-------------------- Repository : " + repoQuery.name + " --------------------------")
-	if contains_docker_file_or_compose_recursively(repoQuery, query):
-		found.append(repoQuery)
+	print('Number of repos kept : ' + str(len(wantedRepo)))
+print("Total : " + str(count))
 
-print('Number of repos kept : ' + str(len(wantedRepo)))
-'''
 '''
 count = 0
 for dir in os.listdir(repositoryClone):
