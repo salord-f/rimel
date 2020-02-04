@@ -11,9 +11,10 @@ garbageW10 = 0
 
 def file_is_interesting(query, file_to_analyze, repo_to_analyze):
 	global garbageW10
-	if (re.search('Dockerfile*', file_to_analyze.path) or re.search('docker-compose*',
-																	file_to_analyze.path)) and repo_to_analyze.get_contents(
-		file_to_analyze.path).type != "dir":
+	if type(repo_to_analyze.get_contents(file_to_analyze.path)) != "dir" and \
+			(re.search('Dockerfile*', file_to_analyze.path)
+			 or re.search('docker-compose*', file_to_analyze.path)):
+
 		content = base64.b64decode(file_to_analyze.content)
 		if re.search(query, content) is not None:
 			try:
@@ -119,7 +120,7 @@ while current_stars > stars:
 	print("loop")
 	try:
 		for q in reposQuery:
-			# print(q.full_name)
+			print("-------------------- Repository : " + q.full_name + " --------------------------")
 			if top_repo is None:
 				top_repo = q
 			# print(str(q.full_name) + " " + str(q.created_at))
@@ -136,7 +137,7 @@ while current_stars > stars:
 		print(err)
 		break
 
-print(current_stars)
+print("Stopped at stars : " + current_stars)
 
 for q in found:
 	print(q.full_name)
