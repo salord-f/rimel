@@ -101,9 +101,9 @@ repos = []
 wantedRepo = []
 wanted = []
 found = []
-initial_date = datetime.date(2011, 1, 1)
-now = datetime.date.today()
-
+initial_date = datetime.date(2018, 1, 1)
+#now = datetime.date.today()
+now = datetime.date(2020, 1, 1)
 x = g.get_repos()
 # reposQuery = g.search_repositories(" created:>2011-01-01")
 query = "stars:>5 topic:javascript"
