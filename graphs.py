@@ -30,20 +30,16 @@ def keyword(data,totalRepos):
     legends = []
     legendsLoc = []
     weights = [[],[],[]]
-    weight = 1/totalRepos
     for i in range(len(data)):
         legendsLoc.append(i+1)
     for i in range(len(data)):
         legends.append(data[i][0])
-        for j in range(data[i][1]):
-            file.append(i+1)
-            weights[0].append(weight)
-        for j in range(data[i][2]):
-            compose.append(i+1)
-            weights[1].append(weight)
-        for j in range(data[i][3]):
-            both.append(i+1)
-            weights[2].append(weight)
+        file.append(i + 1)
+        weights[0].append(data[i][1]/totalRepos)
+        compose.append(i+1)
+        weights[1].append(data[i][2]/totalRepos)
+        both.append(i+1)
+        weights[2].append(data[i][3]/totalRepos)
     bins = [x + 0.5 for x in range(0, len(data)+1)]
     plt.hist([file, compose, both], weights=weights,bins=bins, color=['royalblue', 'darkblue','blueviolet'], label=['dockerfile', 'docker-compose','both'],
                 histtype='bar')  # bar est le defaut
