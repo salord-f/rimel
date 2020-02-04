@@ -11,7 +11,8 @@ garbageW10 = 0
 
 def file_is_interesting(query, file_to_analyze, repo_to_analyze):
 	global garbageW10
-	if (re.search('Dockerfile*', file_to_analyze.path) or re.search('docker-compose*', file_to_analyze.path)) and repo_to_analyze.get_contents(
+	if (re.search('Dockerfile*', file_to_analyze.path) or re.search('docker-compose*',
+																	file_to_analyze.path)) and repo_to_analyze.get_contents(
 		file_to_analyze.path).type != "dir":
 		content = base64.b64decode(file_to_analyze.content)
 		if re.search(query, content) is not None:
@@ -55,6 +56,7 @@ def contains_docker_file_or_compose_recursively(repo_to_analyze, query):
 	return recuFolder(folders, repo_to_analyze)
 
 
+'''
 def tighten_query(query, queries, low_date, high_date):
 	print(low_date)
 	print(high_date)
@@ -92,7 +94,7 @@ def tighten_query(query, queries, low_date, high_date):
 
 	else:
 		print("Day")
-
+'''
 
 g = Github(os.environ['TOKEN'])
 repositoryClone = './repository/'
@@ -101,12 +103,48 @@ repos = []
 wantedRepo = []
 wanted = []
 found = []
-initial_date = datetime.date(2018, 1, 1)
-#now = datetime.date.today()
-now = datetime.date(2020, 1, 1)
+from_date = datetime.date(2018, 1, 1)
+from_date_query = " created:>" + str(datetime.datetime.strptime(from_date.__str__(), '%Y-%m-%d').date())
+# now = datetime.date.today()
 x = g.get_repos()
-# reposQuery = g.search_repositories(" created:>2011-01-01")
-query = "stars:>5 topic:javascript"
+stars = 5
+query = "stars:>" + str(stars) + " topic:javascript sort:stars"
+reposQuery = g.search_repositories(query + from_date_query)
+
+current_stars = stars + 1
+old_top_repo = None
+top_repo = None
+
+while current_stars > stars:
+	print("loop")
+	try:
+		for q in reposQuery:
+			# print(q.full_name)
+			if top_repo is None:
+				top_repo = q
+			# print(str(q.full_name) + " " + str(q.created_at))
+			if contains_docker_file_or_compose_recursively(q, b'mongo'):
+				found.append(q)
+			current_stars = q.stargazers_count
+		query = "stars:" + str(stars) + ".." + str(current_stars) + " topic:javascript sort:stars"
+		reposQuery = g.search_repositories(query + from_date_query)
+		if old_top_repo == top_repo:
+			break
+		old_top_repo = top_repo
+		top_repo = None
+	except Exception as err:
+		print(err)
+		break
+
+print(current_stars)
+
+for q in found:
+	print(q.full_name)
+print(len(found))
+
+# while stars != current_stars:
+
+'''
 queries = []
 tighten_query(query, queries, initial_date, now)
 
@@ -114,7 +152,7 @@ count = 0
 for q in queries:
 	print(q.totalCount)
 	count += q.totalCount
-# query = b'mongo'
+	# query = b'mongo'
 	for repoQuery in q:
 		print("-------------------- Repository : " + repoQuery.name + " --------------------------")
 		if contains_docker_file_or_compose_recursively(repoQuery, query):
@@ -122,6 +160,7 @@ for q in queries:
 
 	print('Number of repos kept : ' + str(len(wantedRepo)))
 print("Total : " + str(count))
+'''
 
 '''
 count = 0
