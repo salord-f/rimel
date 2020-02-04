@@ -1,11 +1,5 @@
 import re
-import pygit2
-from github import Github
-import re
-import base64
-
-# First create a Github instance:
-import os, sys
+import os
 
 numberOfRepo = 0
 inDocker = 0
@@ -14,35 +8,35 @@ inBoth = 0
 query = b'version'
 repositoryClone = './repository/'
 
-def containsWanted(file):
+
+def contains_wanted(file):
     print("------------------------------")
     with open(file, 'r') as fileString:
         data = (fileString.read().replace('\n', '')).encode()
         if re.search(query, data) is not None:
-            print("oui")
             return True
 
 
-def analyzeFile(file):
+def analyze_file(file):
     global inDocker
     global inDockerCompose
     global inBoth
 
-    inDockerBool = False
-    inDockerComposeBool = False
+    in_docker_bool = False
+    in_docker_compose_bool = False
     if re.search('Dockerfile*', file):
-        if containsWanted(file):
+        if contains_wanted(file):
             inDocker += 1
-            inDockerBool = True
+            in_docker_bool = True
     if re.search('docker-compose*', file):
-        if containsWanted(file):
+        if contains_wanted(file):
             inDockerCompose += 1
-            inDockerComposeBool = True
-    if inDockerBool and inDockerComposeBool:
+            in_docker_compose_bool = True
+    if in_docker_bool and in_docker_compose_bool:
         inBoth += 1
         inDocker -= 1
         inDockerCompose -= 1
-    if inDockerBool or inDockerComposeBool:
+    if in_docker_bool or in_docker_compose_bool:
         return True
 
 
@@ -54,16 +48,18 @@ for folder in os.listdir(repositoryClone):
     isDirectory = os.path.isdir(newPath)
     if isFile:
         print("file : " + newPath)
-        if analyzeFile(newPath):
+        if analyze_file(newPath):
             break
     elif isDirectory:
         print("directory : " + newPath)
         for folderRecu in os.listdir(newPath):
             newPathRecu = newPath + "/" + folderRecu
             print("fileRecu : " + "/" + newPathRecu)
-            if analyzeFile(newPathRecu):
+            if analyze_file(newPathRecu):
                 break
-print("numberOfRepo :" + str(numberOfRepo))
-print("inDockerCompose :" + str(inDockerCompose))
-print("inDocker :" + str(inDocker))
-print("inBoth :" + str(inBoth))
+print("##############################################RESULT###########################################################")
+print("String wanted : " + str(query))
+print("Number of repo analyzed : " + str(numberOfRepo))
+print("in DockerCompose : " + str(inDockerCompose))
+print("in Docker : " + str(inDocker))
+print("in Both : " + str(inBoth))
