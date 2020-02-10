@@ -56,10 +56,9 @@ def contains_docker_file_or_compose_recursively(repo_to_analyze, query, recursiv
 
 	for file in files:
 		if file.size > 900000:
-			pass
+			continue
 		if type(repo_to_analyze.get_contents(file.path)) != "github.ContentFile.ContentFile":
-			pass
-
+			continue
 		if file_is_interesting(query, file, repo_to_analyze):
 			return True
 
