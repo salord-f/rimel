@@ -11,9 +11,8 @@ garbageW10 = 0
 
 def file_is_interesting(query, file_to_analyze, repo_to_analyze):
 	global garbageW10
-	if type(repo_to_analyze.get_contents(file_to_analyze.path)) != "dir" and \
-			(re.search('Dockerfile*', file_to_analyze.path)
-			 or re.search('docker-compose*', file_to_analyze.path)):
+	if (re.search('Dockerfile*', file_to_analyze.path)
+			or re.search('docker-compose*', file_to_analyze.path)):
 
 		content = base64.b64decode(file_to_analyze.content)
 		if re.search(query, content) is not None:
@@ -34,11 +33,15 @@ def recuFolder(folders, repo_to_analyze, recursive=False):
 	while folders:
 		file_content = folders.pop(0)
 		if file_content.type == "dir":
+			pass
+			'''
 			print(file_content)
 			folder = repo_to_analyze.get_contents(file_content.path)
 			for file in folder:
 				if file_is_interesting(query, file, repo_to_analyze):
 					return True
+			'''
+
 		# if recursive and recuFolder(repo_to_analyze.get_contents(file_content.path), repo_to_analyze, False):
 		#    return True
 		# folders.extend(repoQuery.get_contents(file_content.path))
@@ -47,55 +50,19 @@ def recuFolder(folders, repo_to_analyze, recursive=False):
 				return True
 
 
-def contains_docker_file_or_compose_recursively(repo_to_analyze, query):
+def contains_docker_file_or_compose_recursively(repo_to_analyze, query, recursive=True):
 	files = repo_to_analyze.get_contents("")
 	folders = repo_to_analyze.get_contents("")
 
 	for file in files:
+		if file.size > 900000:
+			pass
+		if type(repo_to_analyze.get_contents(file.path)) != "github.ContentFile.ContentFile":
+			pass
+
 		if file_is_interesting(query, file, repo_to_analyze):
 			return True
-	return recuFolder(folders, repo_to_analyze)
 
-
-'''
-def tighten_query(query, queries, low_date, high_date):
-	print(low_date)
-	print(high_date)
-	if low_date > high_date:
-		print("Date inversal")
-		return
-	low_date = datetime.datetime.strptime(low_date.__str__(), '%Y-%m-%d').date()
-	high_date = datetime.datetime.strptime(high_date.__str__(), '%Y-%m-%d').date()
-	year_diff = int((high_date.year - low_date.year) / 2)
-	month_diff = int(((high_date.year - low_date.year) * 12 + (high_date.month - low_date.month)) / 2)
-
-	print("Year diff : " + str(year_diff))
-	print("Month diff : " + str(month_diff))
-
-	if year_diff != 0:
-		high_date = high_date.replace(year=int(high_date.year - year_diff))
-		reposQuery = g.search_repositories(query + " created:" + str(low_date) + ".." + str(high_date))
-		print('Total repos queried : ' + str(reposQuery.totalCount))
-		if reposQuery.totalCount < 1000:
-			queries.append(reposQuery)
-			return tighten_query(query, queries, high_date, now)
-		tighten_query(query, queries, low_date, high_date)
-	elif month_diff != 0:
-		print("Month")
-		if high_date.month - month_diff <= 0:
-			high_date = high_date.replace(year=high_date.year - 1, month=12 + high_date.month - month_diff)
-		else:
-			high_date = high_date.replace(year=high_date.year, month=high_date.month - month_diff)
-		reposQuery = g.search_repositories(query + " created:" + str(low_date) + ".." + str(high_date))
-		print('Total repos queried : ' + str(reposQuery.totalCount))
-		if reposQuery.totalCount < 1000:
-			queries.append(reposQuery)
-			return tighten_query(query, queries, high_date, now)
-		tighten_query(query, queries, high_date, now)
-
-	else:
-		print("Day")
-'''
 
 g = Github(os.environ['TOKEN'])
 repositoryClone = './repository/'
@@ -109,7 +76,7 @@ from_date_query = " created:>" + str(datetime.datetime.strptime(from_date.__str_
 # now = datetime.date.today()
 x = g.get_repos()
 stars = 5
-query = "stars:>" + str(stars) + " topic:javascript sort:stars"
+query = "stars:>" + str(stars) + " topic:javascript topic:docker sort:stars"
 reposQuery = g.search_repositories(query + from_date_query)
 
 current_stars = stars + 1
@@ -137,7 +104,7 @@ while current_stars > stars:
 		print(err)
 		break
 
-print("Stopped at stars : " + current_stars)
+print("Stopped at stars : " + str(current_stars))
 
 for q in found:
 	print(q.full_name)
