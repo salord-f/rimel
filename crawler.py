@@ -13,7 +13,9 @@ def file_is_interesting(query, file_to_analyze, repo_to_analyze):
 	global garbageW10
 	if (re.search('Dockerfile*', file_to_analyze.path)
 			or re.search('docker-compose*', file_to_analyze.path)):
-
+		print('====> This repo has a Dockerfile or a docker-compose.yml.')
+		return True
+		'''
 		content = base64.b64decode(file_to_analyze.content)
 		if re.search(query, content) is not None:
 			try:
@@ -27,7 +29,7 @@ def file_is_interesting(query, file_to_analyze, repo_to_analyze):
 				print('Can\'t clone because w10 is garbage')
 			finally:
 				return True
-
+		'''
 
 def recuFolder(folders, repo_to_analyze, query, recursive=True):
 	while folders:
