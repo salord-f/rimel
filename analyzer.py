@@ -1,5 +1,9 @@
 import re
 import os
+import xlsxwriter
+
+#TODO repo de ref docker + standard docker
+#TODO quantifie, def coefficient de conformité, pas dire oui ou non
 
 numberOfRepo = 0
 inDocker = {}
@@ -11,13 +15,26 @@ repositoryClone = './repository/'
 queriesTest = {
     "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
     "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-    "spring": ['version', 'ports', 'environment', 'tests', 'server']
+    "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
 }
-
+queriesExtra = {
+    "connectionBD":
+    {
+        "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
+        "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
+        "spring": ['version', 'ports', 'environment', 'tests', 'server']
+    },
+    "version":
+    {
+        "inDocker": ['version'],
+        "inDockerCompose": ['version'],
+        "spring": ['version']
+    }
+}
 
 def contains_wanted(file, word):
     print("------------------------------")
-    with open(file, 'r') as fileString:
+    with open(file, 'r', encoding="utf8") as fileString:
         data = (fileString.read().replace('\n', '')).encode()
         if re.search(word.encode(), data) is not None:
             return True
@@ -25,7 +42,7 @@ def contains_wanted(file, word):
 
 def analyze_file_docker(file):
     found = []
-    for query_docker in queries:
+    for query_docker in queriesTest["inDocker"]:
         if contains_wanted(file, query_docker):
             found.append(query_docker)
     return found
@@ -33,7 +50,7 @@ def analyze_file_docker(file):
 
 def analyze_file_docker_compose(file):
     found = []
-    for query_compose in queries:
+    for query_compose in queriesTest["inDockerCompose"]:
         if contains_wanted(file, query_compose):
             found.append(query_compose)
     return found
@@ -93,7 +110,7 @@ def find_app_properties(path):
 
 def analyze_file_spring(file):
     found = []
-    for query_spring in queries:
+    for query_spring in queriesTest["inSpring"]:
         if contains_wanted(file, query_spring):
             found.append(query_spring)
     return found
@@ -107,11 +124,13 @@ def analyzeSpring(path):
         return []
 
 
-for query in queries:
-    inDockerCompose[query] = 0
+for query in queriesTest["inDocker"]:
     inDocker[query] = 0
-    inBoth[query] = 0
+for query in queriesTest["inDockerCompose"]:
+    inDockerCompose[query] = 0
+for query in queriesTest["inSpring"]:
     inSpring[query] = 0
+
 
 for folder in os.listdir(repositoryClone):
     docker = ""
@@ -150,21 +169,46 @@ for folder in os.listdir(repositoryClone):
             results_docker_compose = analyze_file_docker_compose(dockerFile)
         for result_docker in results_docker:
             inDocker[result_docker] = inDocker[result_docker] + 1
-            if result_docker in results_docker_compose:
-                inBoth[result_docker] = inBoth[result_docker] + 1
+            #if result_docker in results_docker_compose:
+                #inBoth[result_docker] = inBoth[result_docker] + 1
         for result_docker_compose in results_docker_compose:
             inDockerCompose[result_docker_compose] = inDockerCompose[result_docker_compose] + 1
 
         # ana java / js
-        print("------------------------ ANALYZE OF SRPING --------------------")
+        print("------------------------ ANALYZE OF SPRING --------------------")
         results_spring = analyzeSpring(newPath)
         for result_spring in results_spring:
             inSpring[result_spring] = inSpring[result_spring] + 1
-        print("------------------------ END ANALYZE OF SRPING --------------------")
+        print("------------------------ END ANALYZE OF SPRING --------------------")
 
 print("Number of repo analyzed : " + str(numberOfRepo))
 print("Looking for the words : " + str(queries))
 print("in docker file : " + str(inDocker))
 print("in docker compose : " + str(inDockerCompose))
 print("in spring : " + str(inSpring))
-print("in both : " + str(inBoth))
+#print("in both : " + str(inBoth))
+
+workbook = xlsxwriter.Workbook('data.xlsx')
+worksheet = workbook.add_worksheet()
+row = 0
+col = 0
+
+worksheet.write(row, col + 1, "inDocker")
+for key in inDocker.keys():
+    row += 1
+    worksheet.write(row, col, key)
+    worksheet.write(row, col + 1, inDocker[key])
+row = 0
+col += 1
+worksheet.write(row, col + 1, "inDockerCompose")
+for key in inDockerCompose.keys():
+    row += 1
+    worksheet.write(row, col + 1, inDockerCompose[key])
+row = 0
+col += 1
+worksheet.write(row, col + 1, "inSpring")
+for key in inSpring.keys():
+    row += 1
+    worksheet.write(row, col + 1, inSpring[key])
+
+workbook.close()
