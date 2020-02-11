@@ -1,9 +1,9 @@
 import base64
 import datetime
-# First create a Github instance:
 import os
 import re
 
+import pygit2
 from github import Github
 
 garbageW10 = 0
@@ -40,15 +40,15 @@ def recuFolder(folders, repo_to_analyze, query, recursive=True):
 				return True
 
 
-def contains_docker_file_or_compose_recursively(repo_to_analyze, query, folder = "", recursive=True):
+def contains_docker_file_or_compose_recursively(repo_to_analyze, query, folder="", recursive=True):
 	files = repo_to_analyze.get_contents(folder)
 
 	for file in files:
-		#print(file)
+		# print(file)
 		if file.size > 900000:
 			continue
 		if isinstance(repo_to_analyze.get_contents(file.path), list):
-			#print(repo_to_analyze.get_contents(file.path))
+			# print(repo_to_analyze.get_contents(file.path))
 			if recursive:
 				if recuFolder(repo_to_analyze.get_contents(file.path), repo_to_analyze, query, False):
 					return True
@@ -68,7 +68,7 @@ from_date_query = " created:>" + str(datetime.datetime.strptime(from_date.__str_
 # now = datetime.date.today()
 x = g.get_repos()
 stars = 5
-query = "stars:>" + str(stars) + " topic:javascript sort:stars"
+query = "stars:>" + str(stars) + " topic:spring sort:stars"
 reposQuery = g.search_repositories(query + from_date_query)
 
 current_stars = stars + 1
@@ -77,26 +77,26 @@ top_repo = None
 
 while current_stars > stars:
 	print("loop")
-	try:
-		for q in reposQuery:
+	for q in reposQuery:
+		try:
 			print("-------------------- Repository : " + q.full_name + " --------------------------")
 			if top_repo is None:
 				top_repo = q
 			# print(str(q.full_name) + " " + str(q.created_at))
 			if contains_docker_file_or_compose_recursively(q, b'mongo'):
 				found.append(q)
+				pygit2.clone_repository(q.git_url, './repository/' + q.name + '/')
 			current_stars = q.stargazers_count
-		print('Current stars : ' + srt(current_stars))
-		query = "stars:" + str(stars) + ".." + str(current_stars) + " topic:javascript sort:stars"
-		reposQuery = g.search_repositories(query + from_date_query)
-		if old_top_repo == top_repo:
-			break
-		old_top_repo = top_repo
-		top_repo = None
-	except Exception as err:
-		print('error')
-		print(err)
+		except Exception as err:
+			print('error')
+			print(err)
+	print('Current stars : ' + srt(current_stars))
+	query = "stars:" + str(stars) + ".." + str(current_stars) + " topic:spring sort:stars"
+	reposQuery = g.search_repositories(query + from_date_query)
+	if old_top_repo == top_repo:
 		break
+	old_top_repo = top_repo
+	top_repo = None
 
 print("Stopped at stars : " + str(current_stars))
 
