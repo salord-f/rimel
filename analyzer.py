@@ -1,6 +1,8 @@
 import re
 import os
 import xlsxwriter
+import csv
+
 
 #TODO repo de ref docker + standard docker
 #TODO quantifie, def coefficient de conformité, pas dire oui ou non
@@ -10,6 +12,8 @@ inDocker = {}
 inDockerCompose = {}
 inSpring = {}
 inBoth = {}
+interesting_projects = []
+
 queries = ['version', 'ports', 'environment', 'tests', 'server']
 repositoryClone = './repository/'
 queriesTest = {
@@ -22,13 +26,19 @@ queriesExtra = {
     {
         "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
         "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-        "spring": ['version', 'ports', 'environment', 'tests', 'server']
+        "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
     },
     "version":
     {
         "inDocker": ['version'],
         "inDockerCompose": ['version'],
-        "spring": ['version']
+        "inSpring": ['version']
+    },
+    "extra":
+    {
+        "inDocker": ['ADD', 'FROM', 'EXPOSE', 'tests', 'server'],
+        "inDockerCompose": ['ADD', 'FROM', 'environment', 'tests', 'server'],
+        "inSpring": ['ADD', 'FROM', 'environment', 'tests', 'server']
     }
 }
 
@@ -45,17 +55,23 @@ def contains_wanted(file, word):
 
 def analyze_file_docker(file):
     found = []
-    for query_docker in queriesTest["inDocker"]:
-        if contains_wanted(file, query_docker):
-            found.append(query_docker)
+    for blabla in queriesExtra:
+        keywordsAnalyzed = queriesExtra.get(blabla)
+        for query_docker in keywordsAnalyzed["inDocker"]:
+            if contains_wanted(file, query_docker):
+                found.append(blabla)
+                break
     return found
 
 
 def analyze_file_docker_compose(file):
     found = []
-    for query_compose in queriesTest["inDockerCompose"]:
-        if contains_wanted(file, query_compose):
-            found.append(query_compose)
+    for blabla in queriesExtra:
+        keywordsAnalyzed = queriesExtra.get(blabla)
+        for query_compose in keywordsAnalyzed["inDockerCompose"]:
+            if contains_wanted(file, query_compose):
+                found.append(blabla)
+                break
     return found
 
 
@@ -113,9 +129,12 @@ def find_app_properties(path):
 
 def analyze_file_spring(file):
     found = []
-    for query_spring in queriesTest["inSpring"]:
-        if contains_wanted(file, query_spring):
-            found.append(query_spring)
+    for blabla in queriesExtra:
+        keywordsAnalyzed = queriesExtra.get(blabla)
+        for query_spring in keywordsAnalyzed["inSpring"]:
+            if contains_wanted(file, query_spring):
+                found.append(blabla)
+                break
     return found
 
 
@@ -127,12 +146,10 @@ def analyzeSpring(path):
         return []
 
 
-for query in queriesTest["inDocker"]:
+for query in queriesExtra:
     inDocker[query] = 0
-for query in queriesTest["inDockerCompose"]:
-    inDockerCompose[query] = 0
-for query in queriesTest["inSpring"]:
     inSpring[query] = 0
+    inDockerCompose[query] = 0
 
 
 for folder in os.listdir(repositoryClone):
@@ -178,11 +195,23 @@ for folder in os.listdir(repositoryClone):
             inDockerCompose[result_docker_compose] = inDockerCompose[result_docker_compose] + 1
 
         # ana java / js
-        print("------------------------ ANALYZE OF SPRING --------------------")
+        print("------------------------ SPRING ANALYSIS        --------------------")
         results_spring = analyzeSpring(newPath)
         for result_spring in results_spring:
             inSpring[result_spring] = inSpring[result_spring] + 1
-        print("------------------------ END ANALYZE OF SPRING --------------------")
+        print("------------------------ END OF SPRING ANALYSIS --------------------")
+
+        total = 0
+        if results_docker:
+            total = total + len(results_docker)
+        if results_docker_compose:
+            total = total + len(results_docker_compose)
+        if results_spring:
+            total = total + len(results_spring)
+
+        if total > 0:
+            interesting_projects.append([total, folder])
+
 
 print("Number of repo analyzed : " + str(numberOfRepo))
 print("Looking for the words : " + str(queries))
@@ -190,12 +219,17 @@ print("in docker file : " + str(inDocker))
 print("in docker compose : " + str(inDockerCompose))
 print("in spring : " + str(inSpring))
 #print("in both : " + str(inBoth))
+print("Interesting projects : ")
+interesting_projects.sort(key=lambda x: x[0], reverse=True)
+for interesting_project in interesting_projects:
+    print("Values :", interesting_project[0], "repository :", interesting_project[1])
 
-workbook = xlsxwriter.Workbook('data.xlsx')
+workbook = xlsxwriter.Workbook('data.csv')
 worksheet = workbook.add_worksheet()
 row = 0
 col = 0
 
+worksheet.write(row, col, numberOfRepo)
 worksheet.write(row, col + 1, "inDocker")
 for key in inDocker.keys():
     row += 1
