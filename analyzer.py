@@ -135,10 +135,10 @@ for query in queriesTest["inSpring"]:
 for folder in os.listdir(repositoryClone):
     docker = ""
     dockerFile = ""
-    numberOfRepo += 1
     print("*****************************")
     newPath = repositoryClone + folder
     if os.path.isdir(newPath):
+        numberOfRepo += 1
         print("directory : " + newPath)
         for folderRecu in os.listdir(newPath):
             newPathRecu = newPath + "/" + folderRecu
