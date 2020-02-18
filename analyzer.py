@@ -1,11 +1,8 @@
 import re
 import os
 import xlsxwriter
-import csv
 
-
-#TODO repo de ref docker + standard docker
-#TODO quantifie, def coefficient de conformité, pas dire oui ou non
+# TODO quantifie, def coefficient de conformité, pas dire oui ou non
 
 numberOfRepo = 0
 inDocker = {}
@@ -14,33 +11,29 @@ inSpring = {}
 inBoth = {}
 interesting_projects = []
 
-queries = ['version', 'ports', 'environment', 'tests', 'server']
 repositoryClone = './repository/'
-queriesTest = {
-    "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
-    "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-    "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
-}
+
 queriesExtra = {
     "connectionBD":
-    {
-        "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
-        "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-        "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
-    },
+        {
+            "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
+            "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
+            "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
+        },
     "version":
-    {
-        "inDocker": ['version'],
-        "inDockerCompose": ['version'],
-        "inSpring": ['version']
-    },
+        {
+            "inDocker": ['version'],
+            "inDockerCompose": ['version'],
+            "inSpring": ['version']
+        },
     "extra":
-    {
-        "inDocker": ['ADD', 'FROM', 'EXPOSE', 'tests', 'server'],
-        "inDockerCompose": ['ADD', 'FROM', 'environment', 'tests', 'server'],
-        "inSpring": ['ADD', 'FROM', 'environment', 'tests', 'server']
-    }
+        {
+            "inDocker": ['ADD', 'FROM', 'EXPOSE', 'tests', 'server'],
+            "inDockerCompose": ['ADD', 'FROM', 'environment', 'tests', 'server'],
+            "inSpring": ['ADD', 'FROM', 'environment', 'tests', 'server']
+        }
 }
+
 
 def contains_wanted(file, word):
     print("------------------------------")
@@ -55,22 +48,22 @@ def contains_wanted(file, word):
 
 def analyze_file_docker(file):
     found = []
-    for blabla in queriesExtra:
-        keywordsAnalyzed = queriesExtra.get(blabla)
-        for query_docker in keywordsAnalyzed["inDocker"]:
+    for queriesList in queriesExtra:
+        keywords_analyzed = queriesExtra.get(queriesList)
+        for query_docker in keywords_analyzed["inDocker"]:
             if contains_wanted(file, query_docker):
-                found.append(blabla)
+                found.append(queriesList)
                 break
     return found
 
 
 def analyze_file_docker_compose(file):
     found = []
-    for blabla in queriesExtra:
-        keywordsAnalyzed = queriesExtra.get(blabla)
-        for query_compose in keywordsAnalyzed["inDockerCompose"]:
+    for queriesList in queriesExtra:
+        keywords_analyzed = queriesExtra.get(queriesList)
+        for query_compose in keywords_analyzed["inDockerCompose"]:
             if contains_wanted(file, query_compose):
-                found.append(blabla)
+                found.append(queriesList)
                 break
     return found
 
@@ -89,8 +82,8 @@ def isDocker(file):
         return False
 
 
-def is_src_folder(folder):
-    if re.search('src*', folder):
+def is_src_folder(fold):
+    if re.search('src*', fold):
         return True
     else:
         return False
@@ -112,7 +105,7 @@ def try_construct_path(src_folder):
     new_src_folder = src_folder + "/main/resources/"
     if os.path.isdir(new_src_folder):
         for file in os.listdir(new_src_folder):
-            #file_absolute_path = file + "/" + new_src_folder
+            # file_absolute_path = file + "/" + new_src_folder
             file_absolute_path = new_src_folder + "/" + file
 
             if re.search('application.properties', file_absolute_path):
@@ -129,11 +122,11 @@ def find_app_properties(path):
 
 def analyze_file_spring(file):
     found = []
-    for blabla in queriesExtra:
-        keywordsAnalyzed = queriesExtra.get(blabla)
-        for query_spring in keywordsAnalyzed["inSpring"]:
+    for queriesList in queriesExtra:
+        keywords_analyzed = queriesExtra.get(queriesList)
+        for query_spring in keywords_analyzed["inSpring"]:
             if contains_wanted(file, query_spring):
-                found.append(blabla)
+                found.append(queriesList)
                 break
     return found
 
@@ -151,10 +144,9 @@ for query in queriesExtra:
     inSpring[query] = 0
     inDockerCompose[query] = 0
 
-
 for folder in os.listdir(repositoryClone):
-    docker = ""
-    dockerFile = ""
+    docker = []
+    dockerFile = []
     print("*****************************")
     newPath = repositoryClone + folder
     if os.path.isdir(newPath):
@@ -167,30 +159,37 @@ for folder in os.listdir(repositoryClone):
                 for subFolder in os.listdir(newPathRecu):
                     newPathRecu = newPathRecu + "/" + subFolder
                     if os.path.isfile(newPathRecu):
-                        if isDocker(newPathRecu) and docker == "":
-                            docker = newPathRecu
-                        elif isDockerFile(newPathRecu) and dockerFile == "":
-                            dockerFile = newPathRecu
+                        if isDocker(newPathRecu):
+                            docker.append(newPathRecu)
+                        elif isDockerFile(newPathRecu):
+                            dockerFile.append(newPathRecu)
                         print(newPathRecu)
             elif os.path.isfile(newPathRecu):
-                if isDocker(newPathRecu) and docker == "":
-                    docker = newPathRecu
-                elif isDockerFile(newPathRecu) and dockerFile == "":
-                    dockerFile = newPathRecu
+                if isDocker(newPathRecu):
+                    docker.append(newPathRecu)
+                elif isDockerFile(newPathRecu):
+                    dockerFile.append(newPathRecu)
                 print(newPathRecu)
 
-        results_docker = []
-        results_docker_compose = []
+        results_docker = set()
+        results_docker_compose = set()
         results_spring = []
 
-        if docker != "":
-            results_docker = analyze_file_docker(docker)
-        if dockerFile != "":
-            results_docker_compose = analyze_file_docker_compose(dockerFile)
+        # remove directory from list
+        for dock in docker:
+            results = analyze_file_docker(dock)
+            for result in results:
+                # results_docker.update(result)
+                results_docker_compose.add(result)
+            # results_docker.update(analyze_file_docker(dock))
+        for dock in dockerFile:
+            results = analyze_file_docker(dock)
+            for result in results:
+                # results_docker_compose.update(result)
+                results_docker.add(result)
+            # results_docker_compose.update(analyze_file_docker_compose(dock))
         for result_docker in results_docker:
             inDocker[result_docker] = inDocker[result_docker] + 1
-            #if result_docker in results_docker_compose:
-                #inBoth[result_docker] = inBoth[result_docker] + 1
         for result_docker_compose in results_docker_compose:
             inDockerCompose[result_docker_compose] = inDockerCompose[result_docker_compose] + 1
 
@@ -212,19 +211,17 @@ for folder in os.listdir(repositoryClone):
         if total > 0:
             interesting_projects.append([total, folder])
 
-
 print("Number of repo analyzed : " + str(numberOfRepo))
-print("Looking for the words : " + str(queries))
 print("in docker file : " + str(inDocker))
 print("in docker compose : " + str(inDockerCompose))
 print("in spring : " + str(inSpring))
-#print("in both : " + str(inBoth))
+# print("in both : " + str(inBoth))
 print("Interesting projects : ")
 interesting_projects.sort(key=lambda x: x[0], reverse=True)
 for interesting_project in interesting_projects:
     print("Values :", interesting_project[0], "repository :", interesting_project[1])
 
-workbook = xlsxwriter.Workbook('data.csv')
+workbook = xlsxwriter.Workbook('data.xlsx')
 worksheet = workbook.add_worksheet()
 row = 0
 col = 0
