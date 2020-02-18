@@ -34,10 +34,13 @@ queriesExtra = {
 
 def contains_wanted(file, word):
     print("------------------------------")
-    with open(file, 'r', encoding="utf8") as fileString:
-        data = (fileString.read().replace('\n', '')).encode()
-        if re.search(word.encode(), data) is not None:
-            return True
+    try:
+        with open(file, 'r', encoding="utf8") as fileString:
+            data = (fileString.read().replace('\n', '')).encode()
+            if re.search(word.encode(), data) is not None:
+                return True
+    except Exception:
+        return False
 
 
 def analyze_file_docker(file):
