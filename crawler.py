@@ -102,59 +102,7 @@ while current_stars > stars:
 
 print("Stopped at stars : " + str(current_stars))
 
+print('Repositories found : ' + str(len(found))
+
 for q in found:
 	print(q.full_name)
-print(len(found))
-
-# while stars != current_stars:
-
-'''
-queries = []
-tighten_query(query, queries, initial_date, now)
-
-count = 0
-for q in queries:
-	print(q.totalCount)
-	count += q.totalCount
-	# query = b'mongo'
-	for repoQuery in q:
-		print("-------------------- Repository : " + repoQuery.name + " --------------------------")
-		if contains_docker_file_or_compose_recursively(repoQuery, query):
-			found.append(repoQuery)
-
-	print('Number of repos kept : ' + str(len(wantedRepo)))
-print("Total : " + str(count))
-'''
-
-'''
-count = 0
-for dir in os.listdir(repositoryClone):
-    for file in os.listdir(repositoryClone + dir):
-        # print(file)
-        if re.search('Dockerfile|docker-compose.yml', file):
-            with open(repositoryClone + dir + '/' + file) as f:
-                if re.search('mongo', f.read(), re.IGNORECASE):
-                    count += 1
-                    found.append(dir)
-
-'''
-# print('number of times the string mongo has been located : ' + str(count))
-# print(found)
-# print(str(garbageW10))
-
-'''
-for repo in g.get_organization("dockersamples").get_repos():
-    contents = repo.get_contents("")
-    for content_file in contents:
-        repos.append(repo)
-        if 'Dockerfile' == content_file.path or 'docker-compose.yml' == content_file.path:
-            #if repo.name not in os.listdir('./repository'):
-            wanted.append(repo)
-            print(repo.name)
-            break
-                #pygit2.clone_repository(repo.git_url, './repository/'+repo.name+'/')
-
-
-print('Total repos in org : ' + str(len(repos)))
-print('Total chosen repos : ' + str(len(wanted)))
-'''
