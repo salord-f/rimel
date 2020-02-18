@@ -12,6 +12,8 @@ inDocker = {}
 inDockerCompose = {}
 inSpring = {}
 inBoth = {}
+interesting_projects = []
+
 queries = ['version', 'ports', 'environment', 'tests', 'server']
 repositoryClone = './repository/'
 queriesTest = {
@@ -73,14 +75,14 @@ def analyze_file_docker_compose(file):
     return found
 
 
-def isDocker(file):
+def isDockerFile(file):
     if re.search('Dockerfile*', file):
         return True
     else:
         return False
 
 
-def isDockerFile(file):
+def isDocker(file):
     if re.search('docker-compose*', file):
         return True
     else:
@@ -193,11 +195,23 @@ for folder in os.listdir(repositoryClone):
             inDockerCompose[result_docker_compose] = inDockerCompose[result_docker_compose] + 1
 
         # ana java / js
-        print("------------------------ ANALYZE OF SPRING --------------------")
+        print("------------------------ SPRING ANALYSIS        --------------------")
         results_spring = analyzeSpring(newPath)
         for result_spring in results_spring:
             inSpring[result_spring] = inSpring[result_spring] + 1
-        print("------------------------ END ANALYZE OF SPRING --------------------")
+        print("------------------------ END OF SPRING ANALYSIS --------------------")
+
+        total = 0
+        if results_docker:
+            total = total + len(results_docker)
+        if results_docker_compose:
+            total = total + len(results_docker_compose)
+        if results_spring:
+            total = total + len(results_spring)
+
+        if total > 0:
+            interesting_projects.append([total, folder])
+
 
 print("Number of repo analyzed : " + str(numberOfRepo))
 print("Looking for the words : " + str(queries))
@@ -205,6 +219,10 @@ print("in docker file : " + str(inDocker))
 print("in docker compose : " + str(inDockerCompose))
 print("in spring : " + str(inSpring))
 #print("in both : " + str(inBoth))
+print("Interesting projects : ")
+interesting_projects.sort(key=lambda x: x[0], reverse=True)
+for interesting_project in interesting_projects:
+    print("Values :", interesting_project[0], "repository :", interesting_project[1])
 
 workbook = xlsxwriter.Workbook('data.csv')
 worksheet = workbook.add_worksheet()
