@@ -59,14 +59,14 @@ def analyze_file_docker_compose(file):
     return found
 
 
-def isDocker(file):
+def isDockerFile(file):
     if re.search('Dockerfile*', file):
         return True
     else:
         return False
 
 
-def isDockerFile(file):
+def isDocker(file):
     if re.search('docker-compose*', file):
         return True
     else:
