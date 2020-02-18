@@ -202,15 +202,20 @@ for folder in os.listdir(repositoryClone):
         print("------------------------ END OF SPRING ANALYSIS --------------------")
 
         total = 0
+        project = {
+            "folder": folder
+        }
         if results_docker:
             total = total + len(results_docker)
+            project["docker"] = len(results_docker)
         if results_docker_compose:
             total = total + len(results_docker_compose)
+            project["compose"] = len(results_docker_compose)
         if results_spring:
             total = total + len(results_spring)
-
+            project["spring"] = len(results_spring)
         if total > 0:
-            interesting_projects.append([total, folder])
+            interesting_projects.append([total, project])
 
 
 print("Number of repo analyzed : " + str(numberOfRepo))
@@ -222,7 +227,16 @@ print("in spring : " + str(inSpring))
 print("Interesting projects : ")
 interesting_projects.sort(key=lambda x: x[0], reverse=True)
 for interesting_project in interesting_projects:
-    print("Values :", interesting_project[0], "repository :", interesting_project[1])
+    docker = interesting_project[1]["docker"] if interesting_project[1].get("docker") else 0
+    compose = interesting_project[1]["compose"] if interesting_project[1].get("compose") else 0
+    spring = interesting_project[1]["spring"] if interesting_project[1].get("spring") else 0
+    print("Values :", interesting_project[0], 
+        "dockerfile :", docker,
+        "compose :", compose,
+        "spring :", spring,
+        "repository :", interesting_project[1]["folder"]
+    )
+
 
 workbook = xlsxwriter.Workbook('data.csv')
 worksheet = workbook.add_worksheet()
