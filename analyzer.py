@@ -42,7 +42,9 @@ def contains_wanted(file, word):
             data = (fileString.read().replace('\n', '')).encode()
             if re.search(word.encode(), data) is not None:
                 return True
-    except Exception:
+    except Exception as e:
+        print('EXCEPT')
+        print(e)
         return False
 
 

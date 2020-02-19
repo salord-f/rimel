@@ -2,3 +2,4 @@ xlrd
 pygithub
 pygit2
 xlsxwriter
+matplotlib
