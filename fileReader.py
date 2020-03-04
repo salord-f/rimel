@@ -31,4 +31,4 @@ else:
             row.append(sheet.cell_value(i, j))
         values.append(row)
 
-graphs.keyword(values, labels, repos, "testValuesExcel")
+graphs.keyword(values, labels, repos, "KeywordHist")
