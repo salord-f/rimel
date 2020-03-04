@@ -17,7 +17,7 @@ queriesExtra = {
     "connectionBD":
         {
             "inDocker": ['mysql', 'mongo', 'postgres'],
-            "inDockerCompose": ['database', 'url', 'uri', 'mysql', 'mongo', 'postgres'],
+            "inDockerCompose": ['database', 'url', 'uri'],
             "inSpring": ['database', 'url', 'uri', 'mysql', 'mongo', 'postgres']
         },
     "version":
