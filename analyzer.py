@@ -16,9 +16,9 @@ repositoryClone = './repository/'
 queriesExtra = {
     "connectionBD":
         {
-            "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
-            "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-            "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
+            "inDocker": ['user', 'pass'],
+            "inDockerCompose": ['database', 'user', 'password', 'url', 'uri'],
+            "inSpring": ['database', 'url', 'uri', 'username', 'password']
         },
     "version":
         {
@@ -26,11 +26,17 @@ queriesExtra = {
             "inDockerCompose": ['version'],
             "inSpring": ['version']
         },
+    "port":
+        {
+            "inDocker": ['expose'],
+            "inDockerCompose": ['expose', 'ports'],
+            "inSpring": ['port']
+        },
     "extra":
         {
-            "inDocker": ['ADD', 'FROM', 'EXPOSE', 'tests', 'server'],
-            "inDockerCompose": ['ADD', 'FROM', 'environment', 'tests', 'server'],
-            "inSpring": ['ADD', 'FROM', 'environment', 'tests', 'server']
+            "inDocker": ['from', 'env', 'arg'],
+            "inDockerCompose": ['secrets', 'target', 'environment'],
+            "inSpring": ['profiles']
         }
 }
 
@@ -40,7 +46,7 @@ def contains_wanted(file, word):
     try:
         with open(file, 'r', encoding="utf8") as fileString:
             data = (fileString.read().replace('\n', '')).encode()
-            if re.search(word.encode(), data) is not None:
+            if re.search(word.encode(), data, re.IGNORECASE) is not None:
                 return True
     except Exception as e:
         print('EXCEPT')
