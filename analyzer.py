@@ -14,7 +14,7 @@ interesting_projects = []
 repositoryClone = './repository/'
 
 queriesExtra = {
-    "connectionBD":
+    "dbconnection":
         {
             "inDocker": ['mysql', 'mongo', 'postgres'],
             "inDockerCompose": ['database', 'url', 'uri'],
@@ -34,15 +34,9 @@ queriesExtra = {
         },
     "environment":
         {
-            "inDocker": ['env'],
-            "inDockerCompose": ['environment'],
-            "inSpring": []
-        },
-    "extra":
-        {
-            "inDocker": ['arg'],
-            "inDockerCompose": ['secrets', 'target'],
-            "inSpring": ['profiles']
+            "inDocker": ['prod', 'dev', 'test'],
+            "inDockerCompose": ['target', 'prod', 'dev', 'test'],
+            "inSpring": ['profiles', 'prod', 'dev', 'test']
         }
 }
 
