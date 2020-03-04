@@ -16,9 +16,9 @@ repositoryClone = './repository/'
 queriesExtra = {
     "connectionBD":
         {
-            "inDocker": ['user', 'pass'],
-            "inDockerCompose": ['database', 'user', 'password', 'url', 'uri'],
-            "inSpring": ['database', 'url', 'uri', 'username', 'password']
+            "inDocker": ['mysql', 'mongo', 'postgres'],
+            "inDockerCompose": ['database', 'url', 'uri', 'mysql', 'mongo', 'postgres'],
+            "inSpring": ['database', 'url', 'uri', 'mysql', 'mongo', 'postgres']
         },
     "version":
         {
@@ -32,10 +32,16 @@ queriesExtra = {
             "inDockerCompose": ['expose', 'ports'],
             "inSpring": ['port']
         },
+    "environment":
+        {
+            "inDocker": ['env'],
+            "inDockerCompose": ['environment'],
+            "inSpring": []
+        },
     "extra":
         {
-            "inDocker": ['from', 'env', 'arg'],
-            "inDockerCompose": ['secrets', 'target', 'environment'],
+            "inDocker": ['arg'],
+            "inDockerCompose": ['secrets', 'target'],
             "inSpring": ['profiles']
         }
 }
