@@ -32,3 +32,4 @@ else:
         values.append(row)
 
 graphs.keyword(values, labels, repos, "KeywordHist")
+graphs.keyword_values(values, labels, repos, "KeywordHistValues")
