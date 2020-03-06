@@ -14,11 +14,11 @@ interesting_projects = []
 repositoryClone = './repository/'
 
 queriesExtra = {
-    "connectionBD":
+    "dbconnection":
         {
-            "inDocker": ['version', 'ports', 'environment', 'tests', 'server'],
-            "inDockerCompose": ['version', 'ports', 'environment', 'tests', 'server'],
-            "inSpring": ['version', 'ports', 'environment', 'tests', 'server']
+            "inDocker": ['mysql', 'mongo', 'postgres'],
+            "inDockerCompose": ['database', 'url', 'uri'],
+            "inSpring": ['database', 'url', 'uri', 'mysql', 'mongo', 'postgres']
         },
     "version":
         {
@@ -26,11 +26,17 @@ queriesExtra = {
             "inDockerCompose": ['version'],
             "inSpring": ['version']
         },
-    "extra":
+    "port":
         {
-            "inDocker": ['ADD', 'FROM', 'EXPOSE', 'tests', 'server'],
-            "inDockerCompose": ['ADD', 'FROM', 'environment', 'tests', 'server'],
-            "inSpring": ['ADD', 'FROM', 'environment', 'tests', 'server']
+            "inDocker": ['expose'],
+            "inDockerCompose": ['expose', 'ports'],
+            "inSpring": ['port']
+        },
+    "environment":
+        {
+            "inDocker": ['prod', 'dev', 'test'],
+            "inDockerCompose": ['target', 'prod', 'dev', 'test'],
+            "inSpring": ['profiles', 'prod', 'dev', 'test']
         }
 }
 
@@ -40,7 +46,7 @@ def contains_wanted(file, word):
     try:
         with open(file, 'r', encoding="utf8") as fileString:
             data = (fileString.read().replace('\n', '')).encode()
-            if re.search(word.encode(), data) is not None:
+            if re.search(word.encode(), data, re.IGNORECASE) is not None:
                 return True
     except Exception as e:
         print('EXCEPT')
